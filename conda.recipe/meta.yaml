@@ -1,6 +1,6 @@
 package:
-  name: conda-env
-  version: 1.3.0alpha
+  name: continuum-flask
+  version: 1.0.0
 
 build:
   number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
@@ -29,4 +29,4 @@ test:
     - continuum_flask.helpers
 
 about:
-  home: https://github.com/conda/conda-env/
+  home: https://github.com/ContinuumIO/continuum-flask
