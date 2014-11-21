@@ -4,6 +4,7 @@ import unittest
 
 from continuum_flask import Flask
 from continuum_flask import helpers
+import mock
 
 TESTING = True
 ROOT_PATH = os.getcwd()
@@ -22,3 +23,19 @@ class static_helper_test(unittest.TestCase):
                     '/static/%s' % s,
                     helpers.static_helper(s),
                     msg="generating static url for [%s]" % s)
+
+
+class import_settings_test(unittest.TestCase):
+    def test_imports_module_if_string_provided(self):
+        m = helpers.import_settings('foo', settings_module=__name__)
+        self.assertEqual(m.__name__, self.__module__)
+
+    def test_defaults_to_name_dot_settings(self):
+        with mock.patch.object(helpers, 'import_string') as stub:
+            helpers.import_settings('foo')
+        stub.assert_called_with('foo.settings')
+
+    def test_uses_settings_module_if_present(self):
+        with mock.patch.object(helpers, 'import_string') as stub:
+            helpers.import_settings('foo', 'bar.settings')
+        stub.assert_called_with('bar.settings')
