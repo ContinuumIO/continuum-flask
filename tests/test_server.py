@@ -56,3 +56,7 @@ class FlaskTestCase(unittest.TestCase):
         with mock.patch.object(server, 'helpers') as helpers:
             f = server.Flask('foo', blueprints=blueprints)
         helpers.setup_blueprints.assert_called_with(f, blueprints)
+
+    def test_defaults_root_path_to_cwd(self):
+        f = server.Flask('foo', settings={})
+        self.assertEqual(join(os.getcwd(), 'build'), f.static_folder)
