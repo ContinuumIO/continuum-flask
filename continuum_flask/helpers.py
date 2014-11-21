@@ -21,3 +21,12 @@ def import_settings(name, settings_module=None):
     if settings_module is None:
         settings_module = '{}.{}'.format(name, 'settings')
     return import_string(settings_module)
+
+
+def setup_blueprints(app, blueprints=None):
+    if blueprints is None:
+        return
+
+    with app.app_context():
+        for b in blueprints:
+            app.register_blueprint(import_string(b).blueprint)

@@ -4,6 +4,7 @@ import unittest
 
 from continuum_flask import server
 import flask
+import mock
 
 # Configuration for Flask
 # TODO: Refactor so Flask takes a dict
@@ -44,3 +45,14 @@ class FlaskTestCase(unittest.TestCase):
     def test_allows_dict_to_provide_settings(self):
         f = server.Flask('foo', settings={'ROOT_PATH': 'foo'})
         self.assertEqual(join(os.getcwd(), 'foo', 'build'), f.static_folder)
+
+    def test_dispatches_to_helpers_setup_blueprint(self):
+        with mock.patch.object(server, 'helpers') as helpers:
+            f = server.Flask('foo')
+        helpers.setup_blueprints.assert_called_with(f, None)
+
+    def test_provides_blueprints_to_setup_blueprints(self):
+        blueprints = [mock.Mock(), mock.Mock()]
+        with mock.patch.object(server, 'helpers') as helpers:
+            f = server.Flask('foo', blueprints=blueprints)
+        helpers.setup_blueprints.assert_called_with(f, blueprints)
