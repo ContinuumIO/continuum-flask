@@ -1,0 +1,32 @@
+package:
+  name: conda-env
+  version: 1.3.0alpha
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  string: py{{ environ.get('PY_VER').replace('.', '') }}_{{ environ.get('GIT_BUILD_STR', 'GIT_STUB') }}
+  preserve_egg_dir: yes
+
+source:
+  git_url: ../
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python
+    - setuptools
+    - flask
+
+test:
+  requires:
+    - nose
+    - mock
+  imports:
+    - continuum_flask
+    - continuum_flask.server
+    - continuum_flask.helpers
+
+about:
+  home: https://github.com/conda/conda-env/
