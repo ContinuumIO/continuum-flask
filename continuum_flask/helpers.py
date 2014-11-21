@@ -5,8 +5,17 @@ from werkzeug.utils import import_string
 
 
 class AttributeDict(dict):
-    __getattr__ = dict.__getitem__
-    __setattr__ = dict.__setitem__
+    def __getattr__(self, *args):
+        try:
+            return self.__getitem__(*args)
+        except KeyError:
+            raise AttributeError(*args)
+
+    def __setattr__(self, *args):
+        try:
+            return self.__setitem__(*args)
+        except KeyError:
+            raise AttributeError(*args)
 
 
 def static_helper(filename):

@@ -9,6 +9,28 @@ TESTING = True
 ROOT_PATH = os.getcwd()
 
 
+class AttributeDictTestCase(unittest.TestCase):
+    def test_allows_accessing_dict_as_obj(self):
+        d = helpers.AttributeDict(foo='bar', bar='foo')
+        self.assertEqual(d.foo, 'bar')
+        self.assertEqual(d.bar, 'foo')
+        self.assertEqual(d.foo, d['foo'])
+        self.assertEqual(d.bar, d['bar'])
+
+    def test_allows_getattr_to_be_used_to_set_default(self):
+        d = helpers.AttributeDict(foo='bar')
+        self.assertTrue(getattr(d, 'unknown', True))
+        self.assertFalse(getattr(d, 'unknowable', False))
+
+    def test_allows_setting(self):
+        d = helpers.AttributeDict(foo='bar')
+        d['foo'] = 'baz'
+        self.assertEqual(d.foo, 'baz')
+
+        d.foo = 'biz'
+        self.assertEqual(d.foo, 'biz')
+
+
 class static_helper_test(unittest.TestCase):
     def setUp(self):
         f = self.f = server.Flask(__name__, settings=__name__)
