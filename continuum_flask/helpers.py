@@ -38,4 +38,18 @@ def setup_blueprints(app, blueprints=None):
 
     with app.app_context():
         for b in blueprints:
-            app.register_blueprint(import_string(b).blueprint)
+            if type(b) is str:
+                app.register_blueprint(import_string(b).blueprint)
+            elif len(b) == 1:
+                app.register_blueprint(import_string(b[0]).blueprint)
+            elif len(b) == 3:
+                app.register_blueprint(import_string(b[0]).blueprint,
+                                       *b[1], **b[2])
+            else:
+                kwargs = {}
+                args = b[1]
+                if type(args) is dict:
+                    kwargs = args
+                    args = ()
+                app.register_blueprint(import_string(b[0]).blueprint,
+                                       *args, **kwargs)

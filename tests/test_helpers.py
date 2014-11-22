@@ -8,6 +8,8 @@ import mock
 TESTING = True
 ROOT_PATH = os.getcwd()
 
+stub_blueprint = lambda b: mock.Mock(blueprint=b)
+
 
 class AttributeDictTestCase(unittest.TestCase):
     def test_allows_accessing_dict_as_obj(self):
@@ -122,3 +124,54 @@ class setup_blueprints_test(unittest.TestCase):
             helpers.setup_blueprints(app, ['foo', 'bar'])
 
         self.assertEqual(1, app.app_context.call_count)
+
+    def test_adds_args_and_kwargs_if_not_simple_string(self):
+        app = self.generate_app()
+        with mock.patch.object(helpers, 'import_string') as import_string:
+            import_string.side_effect = [stub_blueprint('foo'), ]
+            blueprints = [
+                ['foo', ('arg1', 'arg2'), {'kwarg1': 'foo', 'kwarg2': 'bar'}],
+            ]
+            helpers.setup_blueprints(app, blueprints=blueprints)
+
+        app.register_blueprint.assert_has_calls([
+            mock.call('foo', 'arg1', 'arg2', kwarg1='foo', kwarg2='bar')
+        ])
+
+    def test_can_handle_kwargs_only(self):
+        app = self.generate_app()
+        with mock.patch.object(helpers, 'import_string') as import_string:
+            import_string.side_effect = [stub_blueprint('foo'), ]
+            blueprints = [
+                ['foo', {'kwarg1': 'foo', 'kwarg2': 'bar'}],
+            ]
+            helpers.setup_blueprints(app, blueprints=blueprints)
+
+        app.register_blueprint.assert_has_calls([
+            mock.call('foo', kwarg1='foo', kwarg2='bar')
+        ])
+
+    def test_can_handle_args_only(self):
+        app = self.generate_app()
+        with mock.patch.object(helpers, 'import_string') as import_string:
+            import_string.side_effect = [stub_blueprint('foo'), ]
+            blueprints = [
+                ['foo', ('arg1', 'arg2')]
+            ]
+            helpers.setup_blueprints(app, blueprints=blueprints)
+
+        app.register_blueprint.assert_has_calls([
+            mock.call('foo', 'arg1', 'arg2')
+        ])
+
+    def test_can_handle_simple_strings_inside_iterables_as_well(self):
+        app = self.generate_app()
+        foo = stub_blueprint('foo')
+        with mock.patch.object(helpers, 'import_string') as import_string:
+            import_string.side_effect = [foo, ]
+            blueprints = [
+                ['foo', ],
+            ]
+            helpers.setup_blueprints(app, blueprints=blueprints)
+
+        app.register_blueprint.assert_has_calls([mock.call('foo')])
