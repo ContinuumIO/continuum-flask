@@ -1,0 +1,6 @@
+name: continuum-flask-test
+channels:
+  - continuumio
+dependencies:
+  - continuum-flask
+  - gunicorn
